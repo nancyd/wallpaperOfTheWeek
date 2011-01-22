@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://java.sun.com/xml/ns/javaee"
+xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+	<servlet>
+		<servlet-name>wallpaper</servlet-name>
+		<jsp-file>/wallpaper.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>wallpaper</servlet-name>
+		<url-pattern>/wallpaper/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>submit</servlet-name>
+		<jsp-file>/submit.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>submit</servlet-name>
+		<url-pattern>/submit</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>Image</servlet-name>
+		<servlet-class>com.wallpaperoftheweek.servlet.Image</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Image</servlet-name>
+		<url-pattern>/image/*</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>Upload</servlet-name>
+		<servlet-class>com.wallpaperoftheweek.servlet.Upload</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Upload</servlet-name>
+		<url-pattern>/upload</url-pattern>
+	</servlet-mapping>
+
+	
+	
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	
+    <security-constraint>
+        <web-resource-collection>
+            <url-pattern>/submit/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>*</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <url-pattern>/upload/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>*</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+</web-app>
