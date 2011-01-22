@@ -10,7 +10,10 @@
 <body>
 <h1>Submit a wallpaper</h1>
 Submit a wallpaper for next week.
-<%BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService(); %>
+
+<%BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();%>
+
+
 <form action="<%= blobstoreService.createUploadUrl("/upload") %>" method="post" enctype="multipart/form-data">
     <input type="file" name="myFile">
     <input type="submit" value="Submit">

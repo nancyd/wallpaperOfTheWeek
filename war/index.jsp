@@ -17,6 +17,37 @@
 	<style type="text/css">
 		img {border: 2px solid transparent}
 	</style>
+     <link type="text/css" href="css/pepper-grinder/jquery-ui-1.8.9.custom.css" rel="Stylesheet" />	
+	 <script type="text/javascript" src="js/jquery/jquery-1.4.4.js"></script>          
+	<script type="text/javascript" src="js/jquery-ui-1.8.9.custom.min.js"></script>
+     <script type="text/javascript">                                      
+     $(document).ready(function(){
+    	 	// Tabs
+    	 	$('#tabs').tabs();
+    	 	
+    	 	// upvotes
+    	 	$(".upvote").click(function(e) {
+	    	 	var targetId = e.target.id
+	    	 	targetId = targetId.replace("upvote-", "votes-")
+	    	 	var oldval = Number($("." + targetId).html());
+    	 		$("." + targetId).html(oldval + 1);
+    	 		
+    	 	});
+       });
+
+     
+     
+     </script>                                                               
+		<style type="text/css">
+			/*demo page css*/
+			body{ font: 62.5% "Trebuchet MS", sans-serif; margin: 50px;}
+			.demoHeaders { margin-top: 2em; }
+			#dialog_link {padding: .4em 1em .4em 20px;text-decoration: none;position: relative;}
+			#dialog_link span.ui-icon {margin: 0 5px 0 0;position: absolute;left: .2em;top: 50%;margin-top: -8px;}
+			ul#icons {margin: 0; padding: 0;}
+			ul#icons li {margin: 2px; position: relative; padding: 4px 0; cursor: pointer; float: left;  list-style: none;}
+			ul#icons span.ui-icon {float: left; margin: 0 4px;}
+		</style>	
 </head>
 <body>
 <h1>Wallpaper of the week</h1>
@@ -29,13 +60,15 @@
   	firstDayOfWeek = fmt.print(dm);
  }
 %>
-<img src="weekwallpaper/<%=firstDayOfWeek%>_preview.jpg">
-<h2>Submissions for next week:</h2>
-<p>Wallpaper receiving the most votes will appear on your desktop next Monday if you have the
-<a href="javascript:void(0)">software</a> installed
-</p>
-<h3>By Votes</h3>
-	<ol>
+
+
+		<h2 class="demoHeaders">Submissions for next week</h2>
+		<div id="tabs" style="height: 270px">
+			<ul>
+				<li><a href="#tabs-1">By votes</a></li>
+				<li><a href="#tabs-2">Random</a></li>
+			</ul>
+			<div id="tabs-1">
 		<%
 			// Fetch wallpapers with the most votes
 			List<Wallpaper> wallpapersByVotes = dao.ofy().query(Wallpaper.class)
@@ -57,39 +90,50 @@
 			
 			// display wallpapers by votes
 			for (Wallpaper w : wallpapersByVotes) {
-				out.print("<li><a href=\"wallpaper/"+w.id+"\">"+
+				out.print("<div style=\"float:left\"> <span id=\"upvote-" + w.id + "\" class=\"upvote upvote-" + w.id + " ui-icon ui-icon-triangle-1-n\"></span><br />" +
+						  "<span class=\"votes-" + w.id + "\">" + w.votes + "</span><br />votes</div>" +
+				 		  "<div style=\"float:left\">" +
+				          "<a href=\"wallpaper/"+w.id+"\">"+
 						  "<img src=\"image/"+w.id+"_thumbnail.jpg\">"+
-						  "</a></li>");
+						  "</a></div>");
 			}
 		%>
-	</ol>
-<h3>Random</h3>
-<div class="random">
-	<%
+			</div>
+			<div id="tabs-2">
+				<%
 		// Get 5 random Wallpapers
 		for (int i=0; i<5; i++) {
 			// get Wallpaper with a "random field" close to some random number
-			Key<Wallpaper> randomKey = dao.ofy().query(Wallpaper.class)
+			Wallpaper w = dao.ofy().query(Wallpaper.class)
 				.filter("random <", Math.random())
-				.limit(1)
-				.getKey();
-			if (randomKey == null) {
+				.limit(1).get();
+			if (w == null) {
 				// random number too small get largest one instead
-				randomKey = dao.ofy().query(Wallpaper.class)
+				w = dao.ofy().query(Wallpaper.class)
 					.order("-random")
 					.limit(1)
-					.getKey();
+					.get();
 			}
-			if (randomKey == null) {
+			if (w == null) {
 				// No wallpapers
 				break;
 			}
-			out.print("<a href=\"wallpaper/"+randomKey.getId()+"\">"+
-					  "<img src=\"image/"+randomKey.getId()+"_thumbnail.jpg\">"+
-					  "</a>");
+			out.print("<div style=\"float:left\"> <span id=\"upvote-" + w.id + "\" class=\"upvote upvote-" + w.id + " ui-icon ui-icon-triangle-1-n\"></span><br />" +
+					  "<span class=\"votes-" + w.id + "\">" + w.votes + "</span><br />votes</div>" +
+			 		  "<div style=\"float:left\">" +
+			          "<a href=\"wallpaper/"+w.id+"\">"+
+					  "<img src=\"image/"+w.id+"_thumbnail.jpg\">"+
+					  "</a></div>");
 		}
 	%>
-</div>
+			
+		</div>
+		</div>
+
+<p>Wallpaper receiving the most votes will appear on your desktop next Monday if you have the
+<a href="javascript:void(0)">software</a> installed
+</p>
+
 <a href="/submit">Submit a wallpaper</a><br>
 <a href="javascript:void(0)">Install Wallpaper of the Week App</a> (Work in progress)
 </body>
