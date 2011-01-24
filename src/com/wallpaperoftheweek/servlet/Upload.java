@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.servlet.http.*;
 
+import org.joda.time.Instant;
+
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.blobstore.BlobstoreService;
@@ -15,6 +17,7 @@ import com.google.appengine.api.images.Transform;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.wallpaperoftheweek.DAO;
+import com.wallpaperoftheweek.MyUtil;
 import com.wallpaperoftheweek.model.ScaledDown;
 import com.wallpaperoftheweek.model.Wallpaper;
 import com.wallpaperoftheweek.model.ScaledDown.Size;
@@ -42,7 +45,8 @@ public class Upload extends HttpServlet {
         // Store image
         Wallpaper wallpaper = new Wallpaper();
         wallpaper.blobKey = blobKey;
-        wallpaper.saltedUserId = Util.saltedHash(userService.getCurrentUser().getUserId());
+        wallpaper.userId = userService.getCurrentUser().getUserId();
+        wallpaper.setAddedOn(new Instant());
         dao.ofy().put(wallpaper);
         
         // Build scaled down versions
@@ -51,6 +55,7 @@ public class Upload extends HttpServlet {
  
         buildScaledDown(dao, wallpaper, imagesService, image, ScaledDown.Size.SIZE_PREVIEW);
         buildScaledDown(dao, wallpaper, imagesService, image, ScaledDown.Size.SIZE_THUMB);
+        resp.sendRedirect("/");
 	}
 
 	private void buildScaledDown(DAO dao, Wallpaper wallpaper, ImagesService imagesService, Image image, Size size) {

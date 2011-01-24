@@ -21,7 +21,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>submit</servlet-name>
 		<url-pattern>/submit</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet>
 		<servlet-name>Image</servlet-name>
 		<servlet-class>com.wallpaperoftheweek.servlet.Image</servlet-class>
@@ -40,6 +40,15 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/upload</url-pattern>
 	</servlet-mapping>
 
+
+	<servlet>
+		<servlet-name>Vote</servlet-name>
+		<servlet-class>com.wallpaperoftheweek.servlet.VoteServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Vote</servlet-name>
+		<url-pattern>/vote/*</url-pattern>
+	</servlet-mapping>
 	
 	
 

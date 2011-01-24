@@ -9,6 +9,7 @@
 <%@page import="com.wallpaperoftheweek.DAO"%>
 <%@page import="com.wallpaperoftheweek.model.Wallpaper"%>
 <%@page import="com.googlecode.objectify.Key"%>
+<%@page import="com.google.appengine.api.users.*"%>
 <% DAO dao = new DAO(); %>
 <!DOCTYPE html>
 <html>
@@ -25,17 +26,42 @@
     	 	// Tabs
     	 	$('#tabs').tabs();
     	 	
+    	 	$("#errorMsg").hide();
+    	 	$("#infoMsg").hide();
+    	 	
     	 	// upvotes
     	 	$(".upvote").click(function(e) {
 	    	 	var targetId = e.target.id
-	    	 	targetId = targetId.replace("upvote-", "votes-")
-	    	 	var oldval = Number($("." + targetId).html());
-    	 		$("." + targetId).html(oldval + 1);
+	    	 	var wallpaperId = targetId.replace("upvote-", "");
+	    	 	$("#infoMsg").html("Sending vote").show();
+	    	 	$("#errorMsg").fadeOut('slow');
+	    	 	$.ajax({
+	    	 		url: "vote/" + wallpaperId,
+	    	 		success: function(data) {
+	    	 			var x = data.split("\n");
+	    	 			var y = x[1].split(":");
+	    	 			
+	        	 		$(".votes-" + y[0]).html(y[1]);
+	    	    	 	$("#infoMsg").fadeOut('slow');
+	    	 		},
+	    	 		error: function(e) {
+	    	    	 	$("#infoMsg").hide();
+	    	    	 	if (e.statusText) {
+		    	    	 	$("#errorMsg").html("Unable to send vote: " + e.statusText).show();
+	    	    	 	} else {
+		    	    	 	$("#errorMsg").html("Unable to send vote: " + e.responseText).show();	    	    	 		
+	    	    	 	}
+	    	 		}
+	    	 	
+	    	 	})
     	 		
     	 	});
        });
 
      
+     function onVoteConfirm() {
+    	 alert("not implemented")
+     }
      
      </script>                                                               
 		<style type="text/css">
@@ -50,7 +76,25 @@
 		</style>	
 </head>
 <body>
+<% 		UserService userService = UserServiceFactory.getUserService();
+if (userService.isUserLoggedIn()) {
+%>
+  <div style="float: right"> Welcome back, <%=userService.getCurrentUser().getNickname() %>
+  <br>
+  <a href="<%=userService.createLogoutURL(request.getRequestURI())%>">Logout</a>
+  </div>
+<%	
+}
+%>
+
+
 <h1>Wallpaper of the week</h1>
+
+
+<div class="ui-widget" style="padding: 0 .7em;">
+  <div class="ui-state-error ui-corner-all"  id="errorMsg"><p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span><span id="errorMsgMsg"></span></p></div>
+  <div class="ui-state-info ui-corner-all" id="infoMsg"></div>
+</div>
 <% 
   // Get first day of week
   String firstDayOfWeek;
@@ -81,9 +125,9 @@
 			Collections.sort(wallpapersByVotes, new Comparator<Wallpaper>() {
 				public int compare(Wallpaper w1, Wallpaper w2) {
 					if (w1.votes < w2.votes)
-						return -1;
-					if (w1.votes > w2.votes)
 						return 1;
+					if (w1.votes > w2.votes)
+						return -1;
 					return 0;
 				}
 			});
@@ -105,7 +149,7 @@
 		for (int i=0; i<5; i++) {
 			// get Wallpaper with a "random field" close to some random number
 			Wallpaper w = dao.ofy().query(Wallpaper.class)
-				.filter("random <", Math.random())
+				.filter("random <", Math.random()).order("-random")
 				.limit(1).get();
 			if (w == null) {
 				// random number too small get largest one instead
@@ -136,5 +180,7 @@
 
 <a href="/submit">Submit a wallpaper</a><br>
 <a href="javascript:void(0)">Install Wallpaper of the Week App</a> (Work in progress)
+
+
 </body>
 </html>
